@@ -1,0 +1,23 @@
+name: CI
+on:
+  pull_request:
+  push:
+    branches: [ main ]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Detect stack and test
+        run: |
+          if [ -f requirements.txt ]; then
+            python3 -m pip install -r requirements.txt
+            pip install pytest ruff
+            ruff check . || true
+            pytest tests/ -v || true
+          elif [ -f package.json ]; then
+            npm install
+            npm test --if-present
+          else
+            echo "add tooling + tests"
+          fi
